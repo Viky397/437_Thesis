@@ -4,19 +4,19 @@ import pandas as pd
 import numpy as np
 import glob
 
-path = r"C:\Users\veron\OneDrive\Desktop\Images_Paul\2020-02-26"
-directories = glob.glob(f"{path}/*/*/*.xlsx")
+path = r"C:\Users_eron\OneDrive\Desktop\02-28-2020_NoFilter_Fan"
+directories = glob.glob(f"{path}/*/*.csv")
 
 hist_data = []
 colors = []
-hist_error = []
+# hist_error = []
 
 colordict = {
-    '532nm': 'tomato',
-    '780nm': 'k',
-    '790nm': 'c',
-    '830nm': 'g',
-    '850nm': 'y'
+    '532': 'tomato',
+    '780': 'k',
+    '790': 'c',
+    '830': 'g',
+    '850': 'y'
     # '999nm': 'orchid'
 }
 
@@ -25,22 +25,20 @@ for d in directories:
     # image = f'{d}.png'
     # name = f'{d}.Histogram.csv'
     
-    csv_file = pd.read_excel(d, names = ['Channel', 'Lum'], encoding = 'utf-8')
-    
+    csv_file = pd.read_csv(d, names = ['Channel', 'Lum'])
     pixel = list(map(int, (csv_file.Channel.tolist())[5:260]))
     data = list(map(int, (csv_file.Lum.tolist())[5:260]))
 
-    tmplabel = d.split('\\')[-3][-8:]
+    # tmplabel = d.split('\\')[-2][-7:]
 
-    if not tmplabel[0].isdigit():
-        tmplabel = tmplabel[1:]
-    color = colordict[tmplabel.split('_')[0]]
+    # if not tmplabel[0].isdigit():
+    #     tmplabel = tmplabel[1:]
+    # color = colordict[tmplabel.split('_')[0]]
 
-    colors.append(color)
+    # colors.append(color)
 
     tmp = np.array(pixel) * np.array(data)
     hist_data.append(np.sum(tmp))
-
     ########### TRIMMING ###################
     # im = Image.open(image)
     # width, height = im.size 
@@ -53,47 +51,41 @@ for d in directories:
 # for i in (np.array_split(hist_data, 6)):
 #     hist_error.append(np.std(i))
 
-################# AVERAGE ######################
-# hist_avg = []
+# x_array = range(0, 120)
 
-# for i in np.array_split(hist_data, 6):
-#     for j in np.array_split(i, 18):
-#         hist_avg.append(np.average(j))
-        
-# x_array = np.linspace(0, 1800, 18)
+############ TO AVERAGE ################
+x_array = range(0, 24)
 
-# colors_avg = ['tomato', 'k', 'c', 'g', 'y', 'orchid']
+temp = np.array_split(hist_data, 5) 
 
-# legend = ['532nm', '780nm', '790nm', '830nm', '850nm', 'No Filter']
+hist_data = []
+for i in temp:
+    tmp = np.array_split(i, 24)
+    for j in tmp:
+        hist_data.append(np.average(j))
 
-# fig, ax = plt.subplots()
-# for i, j, k, l in zip(np.array_split(hist_avg, 6), colors_avg, legend, hist_error):
-#     ax.scatter(x_array, i, color = j, s = 10, label = k)
-
-# ax.set_xlabel('Time (seconds)')
-# ax.set_ylabel('Sum of Dark Counts (1e6)')
-# ax.set_title("Average Every 10 Points of Data")
-# ax.legend()
-
-# plt.show()
-################################################
-
-x_array = range(0,120)
 legend = ['532nm', '780nm', '790nm', '830nm', '850nm']
 
 fig, ax = plt.subplots()
-print(len(hist_data))
 
-for i, j, k in zip(np.array_split(hist_data, 5), np.array_split(colors, 5), legend ):
-    ax.scatter(x_array, i, color = j, s = 10, label = k)
+colors = ['tomato', 'k', 'c', 'g', 'y']
+#########################################
+
+# for i, j, k in zip(np.array_split(hist_data, 5), colors, legend ):
+    
+#     ax.scatter(x_array, i, color = j, s = 10, label = k)
     # ax.errorbar(x_array, i, yerr = l, fmt = 'none', marker = 'none', zorder=0)
 
 # IF ONLY PLOTTING SINGLE FILTER DATA
-# ax.scatter(x_array, hist_data)
+# print(len(hist_data))
+tmp = np.array_split(hist_data, 24)
+hist_data = [np.average(i) for i in tmp]
+ax.scatter(x_array, hist_data)
 
 ax.set_xlabel('Time (seconds)')
-ax.set_ylabel('Sum of Dark Counts (1e6)')
-ax.set_title("Data from Image")
+ax.set_ylabel('Sum of Dark Counts')
+ax.set_title("Data from Images- No Filter_With Fan")
+ax.set_ylim(4e7, 5e7)
 ax.legend()
 
 plt.show()
