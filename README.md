@@ -1,4 +1,4 @@
-# Quantum Key Distribution
+# Quantum Ground Station Study
 This repository contains all the scripts necessary for my fourth year thesis (Phys 437), under Dr. Thomas Jennewein at the Institute of Quantum Computing at the University of Waterloo.
 
 
